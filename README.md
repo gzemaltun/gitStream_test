@@ -2,3 +2,4 @@
 gitStream test repository
 
 gitStream /:\
+Another automation
