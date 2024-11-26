@@ -15,7 +15,7 @@ automations:
           label: "{{ calc.etr }} min review"
           color: {{ colors.red if (calc.etr >= 20) else ( colors.yellow if (calc.etr >= 5) else colors.green ) }}
 
-safe_changes:
+approve_safe_changes:
     # Triggered for any changes that only affect formatting, documentation, tests, or images
     if:
       - {{ is.formatting or is.docs or is.tests or is.image }}
@@ -34,7 +34,7 @@ calc:
   etr: {{ branch | estimatedReviewTime }}
 
 
-# These custom expressions are used in the safe_changes automation
+# These custom expressions are used in the approve_safe_changes automation
 is:
   formatting: {{ source.diff.files | isFormattingChange }}
   docs: {{ files | allDocs }}
