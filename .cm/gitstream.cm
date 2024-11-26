@@ -15,7 +15,18 @@ automations:
           label: "{{ calc.etr }} min review"
           color: {{ colors.red if (calc.etr >= 20) else ( colors.yellow if (calc.etr >= 5) else colors.green ) }}
 
-approve_safe_changes:
+# Flag PRs that are missing a Jira ticket reference in the title or description.
+  # https://docs.gitstream.cm/integrations/jira/
+  label_missing_jira_info:
+    if:
+      - {{ not (has.jira_ticket_in_title or has.jira_ticket_in_desc) }}
+    run:
+      - action: add-label@v1
+        args:
+          label: "missing-jira"
+          color: {{ colors.red }}
+
+safe_changes:
     # Triggered for any changes that only affect formatting, documentation, tests, or images
     if:
       - {{ is.formatting or is.docs or is.tests or is.image }}
@@ -33,8 +44,12 @@ approve_safe_changes:
 calc:
   etr: {{ branch | estimatedReviewTime }}
 
+has:
+  jira_ticket_in_title: {{ pr.title | includes(regex=r/\b[A-Za-z]+-\d+\b/) }}
+  jira_ticket_in_desc: {{ pr.description | includes(regex=r/atlassian.net\/browse\/\w{1,}-\d{3,4}/) }}
 
-# These custom expressions are used in the approve_safe_changes automation
+
+# These custom expressions are used in the safe_changes automation
 is:
   formatting: {{ source.diff.files | isFormattingChange }}
   docs: {{ files | allDocs }}
